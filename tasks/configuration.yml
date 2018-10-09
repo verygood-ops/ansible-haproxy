@@ -11,3 +11,6 @@
   notify: restart haproxy
   tags:
     - haproxy-configuration-update-file
+
+- name: remove empty lines
+  shell: sed -i '/^$/d' "/etc/haproxy/haproxy.cfg"
