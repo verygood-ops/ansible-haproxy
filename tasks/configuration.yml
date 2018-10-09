@@ -4,9 +4,9 @@
   template:
     src: "{{ haproxy_conf_template }}"
     dest: /etc/haproxy/haproxy.cfg
-    owner: root
-    group: root
-    mode: 0640
+    owner: '{{ haproxy_global_user }}'
+    group: '{{ haproxy_global_group }}'
+    mode: 0644
     validate: 'haproxy -f %s -c'
   notify: restart haproxy
   tags:
