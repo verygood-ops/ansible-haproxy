@@ -10,7 +10,7 @@ haproxy_install: []
 haproxy_restart_handler_state: restarted
 
 # we're using supervisor to control it
-service_default_state: stopped
+service_default_state: started
 service_default_enabled: false
 
 haproxy_conf_template: "etc/haproxy/haproxy.cfg.j2"
