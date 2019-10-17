@@ -1,0 +1,13 @@
+#resolvers dns
+#  nameserver google 8.8.8.8:53
+#  hold valid 1s
+{% for resolver in haproxy_resolvers %}
+resolver {{ resolver.name }}
+{% if resolver.nameserver is defined %}
+  nameserver {{ resolver.nameserver }} {{ resolver.nameserver_ip }}:{{ resolver.nameserver_port }}
+{% endif %}
+{% if resolver.hold_valid is defined %}
+  hold valid {{ resolver.hold_valid }}
+{% endif %}
+
+{% endfor %}
