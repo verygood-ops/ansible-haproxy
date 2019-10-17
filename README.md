@@ -280,6 +280,14 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_backend.{n}.errorfile.{n}.code`: [required]: The HTTP status code. Currently, HAProxy is capable of generating codes 200, 400, 403, 408, 500, 502, 503, and 504 (e.g. `400`)
 * `haproxy_backend.{n}.errorfile.{n}.file`: [required]: A file containing the full HTTP response (e.g `/etc/haproxy/errors/400.http`)
 
+* `haproxy_resolvers.name`: [required]: Resolver Name
+* `haproxy_resolvers.nameserver`: [required]: DNS server Name
+* `haproxy_resolvers.nameserver_ip`: [required]: DNS server IP
+* `haproxy_resolvers.nameserver_port`: [required]: DNS server port
+* `haproxy_resolvers.hold_valid`: [optional]: Defines <period> during which the last name resolution should be kept based on last resolution <status>. Default value is 10s for "valid".
+* `haproxy_resolvers.resolve_retries`: [optional]: Defines the number <nb> of queries to send to resolve a server name before giving up. Default value: 3
+* `haproxy_resolvers.timeout_retry`: [optional]: Defines timeouts related to name resolution. Default value: 1s
+
 * `haproxy_userlists`: [default: `[]`]: Userlist declarations
 * `haproxy_userlists.{n}.name`: [required]: The name of the userlist
 * `haproxy_userlists.{n}.users`: [required] Userlist users declarations
