@@ -1,6 +1,8 @@
 #resolvers dns
 #  nameserver google 8.8.8.8:53
 #  hold valid 1s
+#  resolve_retries 3
+#  timeout retry 1s
 {% for resolver in haproxy_resolvers %}
 resolver {{ resolver.name }}
 {% if resolver.nameserver is defined %}
@@ -8,6 +10,14 @@ resolver {{ resolver.name }}
 {% endif %}
 {% if resolver.hold_valid is defined %}
   hold valid {{ resolver.hold_valid }}
+{% endif %}
+
+{% if resolver.resolve_retries is defined %}
+  resolve_retries {{ resolver.resolve_retries }}
+{% endif %}
+
+{% if resolver.timeout_retry is defined %}
+  timeout retry {{ resolver.timeout_retry }}
 {% endif %}
 
 {% endfor %}
