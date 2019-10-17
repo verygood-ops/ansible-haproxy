@@ -4,7 +4,7 @@
 #  resolve_retries 3
 #  timeout retry 1s
 {% for resolver in haproxy_resolvers %}
-resolver {{ resolver.name }}
+resolvers {{ resolver.name }}
 {% if resolver.nameserver is defined %}
   nameserver {{ resolver.nameserver }} {{ resolver.nameserver_ip }}:{{ resolver.nameserver_port }}
 {% endif %}
