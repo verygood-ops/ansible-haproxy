@@ -33,6 +33,10 @@
     - haproxy
     - haproxy-configuration
 
+# Pause for 10 sec for systemd
+- pause:
+    seconds: 10
+
 - name: start and enable service
   service:
     name: haproxy
