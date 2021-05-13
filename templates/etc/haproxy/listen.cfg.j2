@@ -144,3 +144,13 @@ listen {{ listen.name }}
   {{ line }}
 {% endfor %}
 {% endfor %}
+
+listen stats
+  description Global statistics
+  bind {{haproxy_global_stats.listen_ip}}:{{haproxy_global_stats.listen_port}}
+  mode http
+  stats enable
+  stats uri /
+  stats refresh 5s
+  stats hide-version
+  stats show-node
