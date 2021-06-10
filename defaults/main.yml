@@ -23,7 +23,7 @@ haproxy_global_stats:
   listen_ip: 0.0.0.0
   listen_port: 1936
   sockets:
-    - listen: /run/haproxy/admin.sock
+    - listen: /run/haproxy-master.sock
   timeout: 30s
 haproxy_global_user: haproxy
 haproxy_global_group: haproxy
