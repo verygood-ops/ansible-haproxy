@@ -1,6 +1,6 @@
 ## haproxy
 
-[![Build Status](https://travis-ci.org/Oefenweb/ansible-haproxy.svg?branch=master)](https://travis-ci.org/Oefenweb/ansible-haproxy)
+[![CI](https://github.com/Oefenweb/ansible-haproxy/workflows/CI/badge.svg)](https://github.com/Oefenweb/ansible-haproxy/actions?query=workflow%3ACI)
 [![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-haproxy-blue.svg)](https://galaxy.ansible.com/Oefenweb/haproxy)
 
 Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu systems.
@@ -8,12 +8,14 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 #### Requirements
 
 * `python-apt`
+* `software-properties-common` (will be installed)
+* `dirmngr` (will be installed)
 
 #### Variables
 
 * `haproxy_use_ppa`: [default: `true`]: Whether or not to add the PPA (for installation)
 
-* `haproxy_version`: [default: `1.8`]: Version to install (e.g. `1.5`, `1.6`, `1.7`, `1.8`, `1.9`, `2.0`, `2.1`)
+* `haproxy_version`: [default: `2.0`]: Version to install (e.g. `1.5` ... `2.8`)
 
 * `haproxy_install`: [default: `[]`]: Additional packages to install (e.g. `socat`)
 
@@ -78,6 +80,7 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_default_raw_options`: [default: `[]`]: Additional arbitrary lines to insert in the section
 
 * `haproxy_ssl_map`: [default: `[]`]: SSL declarations
+* `haproxy_ssl_map.{n}.state`: [default: `present`]: Whether to ensure the file is present or absent
 * `haproxy_ssl_map.{n}.src`: The local path of the file to copy, can be absolute or relative (e.g. `../../../files/haproxy/etc/haproxy/ssl/star-example-com.pem`)
 * `haproxy_ssl_map.{n}.dest`: The remote path of the file to copy (e.g. `/etc/haproxy/ssl/star-example-com.pem`)
 * `haproxy_ssl_map.{n}.owner`: The name of the user that should own the file (optional, default `root`)
@@ -93,7 +96,9 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_listen.{n}.bind_process`:  [optional]: Limits the declaration to a certain set of processes numbers (e.g. `[all]`, `[1]`, `[2 ,3, 4]`)
 * `haproxy_listen.{n}.mode`: [optional]: Set the running mode or protocol of the section (e.g. `http`)
 * `haproxy_listen.{n}.balance`: [required]: The load balancing algorithm to be used (e.g. `roundrobin`)
+* `haproxy_listen.{n}.hash_type`: [optional]: The hashing type to be used for balancing (e.g. `consistent`)
 * `haproxy_listen.{n}.maxconn`: [optional]: Fix the maximum number of concurrent connections
+* `haproxy_listen.{n}.logformat`: [optional]: Specifies the log format string to use for traffic logs (e.g. `'"%{+Q}o\ %t\ %s\ %{-Q}r"'`)
 * `haproxy_listen.{n}.source`: [optional]: Set the source address or interface for connections from the proxy
 * `haproxy_listen.{n}.option`: [optional]: Options to set (e.g. `[dontlog-normal]`)
 * `haproxy_listen.{n}.no_option`: [optional]: Options to set (e.g. `[dontlog-normal]`)
@@ -112,6 +117,9 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_listen.{n}.capture.type`: [required]: What to capture (`cookie`, `request header`, `response header`)
 * `haproxy_listen.{n}.capture.name`: [required]: Name of the header or cookie to capture
 * `haproxy_listen.{n}.capture.length`: [required]: Maximum number of characters to capture and report in the logs
+* `haproxy_listen.{n}.filter`: [optional]: Content filters to apply to this section
+* `haproxy_listen.{n}.filter.{n}.name`: [required]: The name of the filter
+* `haproxy_listen.{n}.filter.{n}.param`: [default: `[]`]: Parameters for the filter
 * `haproxy_listen.{n}.http_request`: [optional]: Access control for Layer 7 requests
 * `haproxy_listen.{n}.http_request.{n}.action`: [required]: The rules action (e.g. `add-header`)
 * `haproxy_listen.{n}.http_request.{n}.param`: [optional]: The complete line to be added (e.g. `X-Forwarded-Proto https`)
@@ -222,6 +230,9 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_frontend.{n}.capture.type`: [required]: What to capture (`cookie`, `request header`, `response header`)
 * `haproxy_frontend.{n}.capture.name`: [required]: Name of the header or cookie to capture
 * `haproxy_frontend.{n}.capture.length`: [required]: Maximum number of characters to capture and report in the logs
+* `haproxy_frontend.{n}.filter`: [optional]: Content filters to apply to this section
+* `haproxy_frontend.{n}.filter.{n}.name`: [required]: The name of the filter
+* `haproxy_frontend.{n}.filter.{n}.param`: [default: `[]`]: Parameters for the filter
 * `haproxy_frontend.{n}.http_request`: [optional]: Access control for Layer 7 requests
 * `haproxy_frontend.{n}.http_request.{n}.action`: [required]: The rules action (e.g. `add-header`)
 * `haproxy_frontend.{n}.http_request.{n}.param`: [optional]: The complete line to be added (e.g. `X-Forwarded-Proto https`)
@@ -297,10 +308,11 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_backend.{n}.source`: [optional]: Set the source address or interface for connections from the proxy
 * `haproxy_backend.{n}.option`: [optional]: Options to set (e.g. `[forwardfor]`)
 * `haproxy_backend.{n}.no_option`: [optional]: Options to unset (e.g. `[redispatch]`)
-* `haproxy_backend.{n}.http_check`: [optional]: Make HTTP health checks consider response contents or specific status codes (e.g. `expect status 403`)
+* `haproxy_backend.{n}.http_check.{n}`: [optional]: Configure HTTP health checks (e.g. `expect status 403`, `send meth GET uri /healthz`)
 * `haproxy_backend.{n}.stick`: [optional]: Stick declarations
 * `haproxy_backend.{n}.stick.{n}.table`: [required]: Configure the stickiness table for the current section (e.g. `type ip size 500k`)
 * `haproxy_backend.{n}.stick.{n}.stick_on`: [optional]: Define a request pattern to associate a user to a server (e.g. `src`)
+* `haproxy_backend.{n}.hash_type`: [optional]: The hashing type to be used for balancing (e.g. `consistent`)
 * `haproxy_backend.{n}.no_option`: [optional]: Options to unset (e.g. `[forceclose]`)
 * `haproxy_backend.{n}.no_log`: [optional, default `false`]: Used when the logger list must be flushed. For example, if you don't want to inherit from the default logger list
 * `haproxy_backend.{n}.tcp_check`: [optional]: Perform health checks using tcp-check send/expect sequences (e.g. `['expect string +OK\ POP3\ ready']`)
@@ -344,6 +356,9 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_backend.{n}.rspirep.{n}.string`: [required]: The complete line to be added. Any space or known delimiter must be escaped using a backslash (`'\'`) (in version < 1.6)
 * `haproxy_backend.{n}.rspirep.{n}.cond`: [optional]: Matching condition built from ACLs
 * `haproxy_backend.{n}.cookie`: [optional]: Enable cookie-based persistence in a backend (e.g. `JSESSIONID prefix nocache`)
+* `haproxy_backend.{n}.filter`: [optional]: Content filters to apply to this section
+* `haproxy_backend.{n}.filter.{n}.name`: [required]: The name of the filter
+* `haproxy_backend.{n}.filter.{n}.param`: [default: `[]`]: Parameters for the filter
 * `haproxy_backend.{n}.http_request`: [optional]: Access control for Layer 7 requests
 * `haproxy_backend.{n}.http_request.{n}.action`: [required]: The rules action (e.g. `add-header`)
 * `haproxy_backend.{n}.http_request.{n}.param`: [optional]: The complete line to be added (e.g. `X-Forwarded-Proto https`)
@@ -385,7 +400,9 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_backend.{n}.server_dynamic.{n}.param`: [optional]: A list of parameters to apply on each backend server.
 * `haproxy_backend.{n}.retry_on`: [optional, default `[]`]: Specify when to attempt to automatically retry a failed request. Provide a list of keywords or HTTP status codes, each representing a type of failure event on which an attempt to retry the request is desired. For details, see HAProxy documentation.
 * `haproxy_backend.{n}.retries`: [optional]: Number of retries to perform on a server after a connection failure
-
+* `haproxy_backend.{n}.email_alert`: [default: `[]`]: Specify email alerts option
+* `haproxy_backend.{n}.email_alert.{n}.code`: [required]: Email alert key can be : mailers, from, to or level
+* `haproxy_backend.{n}.email_alert.{n}.value`: [required]: Email alert key value
 
 * `haproxy_backend.{n}.errorfile`: [optional]: Errorfile declarations
 * `haproxy_backend.{n}.errorfile.{n}.code`: [required]: The HTTP status code. Currently, HAProxy is capable of generating codes 200, 400, 403, 408, 500, 502, 503, and 504 (e.g. `400`)
@@ -418,6 +435,41 @@ Set up (the latest version of) [HAProxy](http://www.haproxy.org/) in Ubuntu syst
 * `haproxy_acl_files.{n}.dest`: [required]: The remote path of the file (e.g. `/etc/haproxy/acl/api.map`)
 * `haproxy_acl_files.{n}.content`: [default: `[]`]: The content (lines) of the file (e.g. `['v1.0 be_alpha', 'v1.1 be_bravo']`)
 
+* `haproxy_letsencrypt_ssl_deploy_template`: [default: `usr/local/bin/haproxy-letsencrypt-ssl-deploy.j2`]: Template to deploy SSL certificates after creation and renewal by Letsencrypt
+* `haproxy_letsencrypt_ssl_first_cert`: [default: `inventory_hostname`]: Name of the certificate that should be the first
+* `haproxy_letsencrypt_ssl_src_path`: [default: `/etc/letsencrypt/live`]: Path to the directory with the certificates (in directories)
+* `haproxy_letsencrypt_ssl_fullchain_name`: [default: `fullchain.pem`]: Filename of the fullchain certificate
+* `haproxy_letsencrypt_ssl_chain_name`: [default: `chain.pem`]: Filename of the chain certificate
+* `haproxy_letsencrypt_ssl_privkey_name`: [default: `privkey.pem`]: Filename of the private key
+* `haproxy_letsencrypt_ssl_cert_name`: [default: `cert.pem`]: Filename of the certificate
+* `haproxy_letsencrypt_ocsp_deploy_template`: [default: `usr/local/bin/haproxy-letsencrypt-ocsp-deploy.j2`]: Template to deploy OCSP certificates after creation, renewal (by Letsencrypt) and daily
+* `haproxy_letsencrypt_ocsp_deploy_job`: [optional]: OCSP deploy job (scheduled by `cron.d`)
+* `haproxy_letsencrypt_ocsp_deploy_job.state`: [default: `absent`]: Whether to ensure the job is present or absent
+* `haproxy_letsencrypt_ocsp_deploy_job.day`: [default: `*`]: Day of the month the job should run (`1-31`, `*`, `*/2`)
+* `haproxy_letsencrypt_ocsp_deploy_job.hour`: [default: `0`]: Hour when the job should run (e.g. `0-23`, `*`, `*/2`)
+* `haproxy_letsencrypt_ocsp_deploy_job.minute`: [default: `0`]: Minute when the job should run (e.g. `0-59`, `*`, `*/2`)
+* `haproxy_letsencrypt_ocsp_deploy_job.month`: [default: `*`]: Month of the year the job should run (e.g `1-12`, `*`, `*/2`)
+* `haproxy_letsencrypt_ocsp_deploy_job.weekday`: [default: `*`]: Day of the week that the job should run (e.g. `0-6` for Sunday-Saturday, `*`)
+
+* `haproxy_cache`: [default: `[]`]: Caching declarations
+* `haproxy_cache.{n}.name`: [required]: The name of the cache
+* `haproxy_cache.{n}.total_max_size`: [optional]: Max size (in MB) of the cache
+* `haproxy_cache.{n}.max_object_size`: [optional]: Max size (in MB) of any single object in the cache
+* `haproxy_cache.{n}.max_age`: [optional]: Max age (in seconds) to hold an item in cache
+
+* `haproxy_program`: [default: `[]`]: Program declarations
+* `haproxy_program.{n}.name`: [required]: The name of the program
+* `haproxy_program.{n}.command`: [optional]: Command to execute
+* `haproxy_program.{n}.option`: [default: `[]`]: Options to enable
+* `haproxy_program.{n}.no_option`: [default: `[]`]: Options to inverse/disable
+
+* `haproxy_mailers`: [default: `[]`]: Mailers declarations
+* `haproxy_mailers.{n}.name`: [required]: The name of the mailers group
+* `haproxy_mailers.{n}.servers`: [default: `[]`]: SMTP servers declarations
+* `haproxy_mailers.{n}.servers.{n}.name`: [required]: SMTP server name
+* `haproxy_mailers.{n}.servers.{n}.host`: [required]: SMTP server host
+* `haproxy_mailers.{n}.servers.{n}.port`: [default: `25`]: SMTP server name port
+
 ## Dependencies
 
 None
@@ -433,7 +485,7 @@ None
 ---
 - hosts: all
   roles:
-    - haproxy
+    - oefenweb.haproxy
   vars:
     haproxy_ssl_map:
       - src: ../../../files/haproxy/etc/haproxy/ssl/star-example0-com.pem
@@ -555,7 +607,7 @@ None
 ```yaml
 - hosts: all
   roles:
-    - haproxy
+    - oefenweb.haproxy
   vars:
     haproxy_global_stats_sockets_default_param:
       - 'mode 660'
@@ -683,7 +735,7 @@ None
 ---
 - hosts: all
   roles:
-    - haproxy
+    - oefenweb.haproxy
   vars:
     haproxy_frontend:
       - name: memcached
@@ -718,7 +770,7 @@ None
 ---
 - hosts: all
   roles:
-    - haproxy
+    - oefenweb.haproxy
   vars:
     haproxy_listen:
       - name: redis

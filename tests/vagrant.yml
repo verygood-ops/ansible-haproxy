@@ -1,9 +1,10 @@
-# test file for haproxy
+# test file
 ---
 - hosts: all
   remote_user: vagrant
   become: true
+  pre_tasks:
+    - name: include vars
+      ansible.builtin.include_vars: "{{ playbook_dir }}/vars/main.yml"
   roles:
     - ../../
-  vars:
-    haproxy_version: "{{ (ansible_distribution_version is version('12.04', '>')) | ternary(1.8, 1.7) }}"

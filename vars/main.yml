@@ -1,4 +1,4 @@
-# vars file for haproxy
+# vars file
 ---
 haproxy_versions_supported:
   - '1.5'
@@ -9,5 +9,19 @@ haproxy_versions_supported:
   - '2.0'
   - '2.1'
   - '2.2'
+  - '2.3'
+  - '2.4'
+  - '2.5'
+  - '2.6'
+  - '2.7'
+  - '2.8'
+
+haproxy_dependencies_pre:
+  - software-properties-common
+  - dirmngr
 
 haproxy_ppa: "ppa:vbernat/haproxy-{{ haproxy_version }}"
+
+haproxy_letsencrypt_ssl_deploy: /usr/local/bin/haproxy-letsencrypt-ssl-deploy
+
+haproxy_letsencrypt_ocsp_deploy: /usr/local/bin/haproxy-letsencrypt-ocsp-deploy
