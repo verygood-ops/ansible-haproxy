@@ -156,7 +156,7 @@ listen {{ listen.name }}
 
 listen stats
   description Global statistics
-  bind {{haproxy_global_stats.listen_ip}}:{{haproxy_global_stats.listen_port}}
+  bind :{{haproxy_global_stats.listen_port}}
   mode http
   stats enable
   stats uri /
